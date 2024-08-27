@@ -1,12 +1,5 @@
 using System.Runtime.InteropServices.JavaScript;
 
-
-public static partial class Utility
-{
-    [JSImport("utility.createFloat32Array", "main.js")]
-    public static partial JSObject CreateFloat32Array(double[] array);
-}
-
 public static partial class GL
 {
     [JSImport("gl.createShader", "main.js")]

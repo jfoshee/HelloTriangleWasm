@@ -27,28 +27,26 @@ var positionBuffer = GL.CreateBuffer();
 GL.BindBuffer(GL.ARRAY_BUFFER, positionBuffer);
 
 // Define the positions for the triangle.
-double[] positionsDouble =
+Span<float> positions =
 [
     0.0f, 1.0f,
     -1.0f, -1.0f,
     1.0f, -1.0f
 ];
-var positions = Utility.CreateFloat32Array(positionsDouble);
-GL.BufferData(GL.ARRAY_BUFFER, positions, GL.STATIC_DRAW);
+Utility.GlBufferData(GL.ARRAY_BUFFER, positions, GL.STATIC_DRAW);
 
 // Create a buffer for the triangle's colors.
 var colorBuffer = GL.CreateBuffer();
 GL.BindBuffer(GL.ARRAY_BUFFER, colorBuffer);
 
 // Define the colors for each vertex of the triangle (Rainbow: Red, Green, Blue).
-double[] colorsDouble =
+Span<float> colors =
 [
     1.0f, 0.0f, 0.0f, 1.0f, // Red
     0.0f, 1.0f, 0.0f, 1.0f, // Green
     0.0f, 0.0f, 1.0f, 1.0f  // Blue
 ];
-var colors = Utility.CreateFloat32Array(colorsDouble);
-GL.BufferData(GL.ARRAY_BUFFER, colors, GL.STATIC_DRAW);
+Utility.GlBufferData(GL.ARRAY_BUFFER, colors, GL.STATIC_DRAW);
 
 // Tell WebGL how to pull out the positions from the position buffer into the vertexPosition attribute.
 GL.BindBuffer(GL.ARRAY_BUFFER, positionBuffer);
