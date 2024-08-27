@@ -16,13 +16,10 @@ var shaderProgram = GL.CreateProgram();
 GL.AttachShader(shaderProgram, vertexShader);
 GL.AttachShader(shaderProgram, fragmentShader);
 GL.LinkProgram(shaderProgram);
-
 if (!GL.GetProgramParameter(shaderProgram, GL.LINK_STATUS))
 {
-    Console.Error.WriteLine("Unable to initialize the shader program: " + GL.GetProgramInfoLog(shaderProgram));
-    return;
+    throw new Exception("Unable to initialize the shader program: " + GL.GetProgramInfoLog(shaderProgram));
 }
-
 GL.UseProgram(shaderProgram);
 
 // Create a buffer for the triangle's positions.
