@@ -1,31 +1,14 @@
-using System;
 using System.Runtime.InteropServices.JavaScript;
+using HelloTriangleWasm;
 
 Console.WriteLine("Hello, Browser!");
 
 // Vertex shader program
-string vsSource = @"
-    attribute vec4 aVertexPosition;
-    attribute vec4 aVertexColor;
-    varying lowp vec4 vColor;
-
-    void main(void) {
-        gl_Position = aVertexPosition;
-        vColor = aVertexColor;
-    }";
-
-// Fragment shader program
-string fsSource = @"
-    varying lowp vec4 vColor;
-
-    void main(void) {
-        gl_FragColor = vColor;
-    }";
-
-// Load and compile the vertex shader
+string vsSource = ResourceLoading.LoadEmbeddedResourceText("Shaders.vertex.glsl");
 var vertexShader = LoadShader(GL.VERTEX_SHADER, vsSource);
 
 // Load and compile the fragment shader
+string fsSource = ResourceLoading.LoadEmbeddedResourceText("Shaders.fragment.glsl");
 var fragmentShader = LoadShader(GL.FRAGMENT_SHADER, fsSource);
 
 // Create and link the shader program

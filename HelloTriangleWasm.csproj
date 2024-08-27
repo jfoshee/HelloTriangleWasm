@@ -2,5 +2,14 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Shaders\fragment.glsl" />
+    <None Remove="Shaders\vertex.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Shaders\fragment.glsl" />
+    <EmbeddedResource Include="Shaders\vertex.glsl" />
+  </ItemGroup>
 </Project>
