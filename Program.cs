@@ -3,28 +3,104 @@ using System.Runtime.InteropServices.JavaScript;
 
 Console.WriteLine("Hello, Browser!");
 
-// Cornflower blue
-MyClass.ClearColor(0.39f, 0.58f, 0.93f, 1);
-MyClass.Clear(MyClass.COLOR_BUFFER_BIT);
+// Vertex shader program
+string vsSource = @"
+    attribute vec4 aVertexPosition;
+    attribute vec4 aVertexColor;
+    varying lowp vec4 vColor;
 
-public partial class MyClass
+    void main(void) {
+        gl_Position = aVertexPosition;
+        vColor = aVertexColor;
+    }";
+
+// Fragment shader program
+string fsSource = @"
+    varying lowp vec4 vColor;
+
+    void main(void) {
+        gl_FragColor = vColor;
+    }";
+
+// Load and compile the vertex shader
+var vertexShader = LoadShader(GL.VERTEX_SHADER, vsSource);
+
+// Load and compile the fragment shader
+var fragmentShader = LoadShader(GL.FRAGMENT_SHADER, fsSource);
+
+// Create and link the shader program
+var shaderProgram = GL.CreateProgram();
+GL.AttachShader(shaderProgram, vertexShader);
+GL.AttachShader(shaderProgram, fragmentShader);
+GL.LinkProgram(shaderProgram);
+
+if (!GL.GetProgramParameter(shaderProgram, GL.LINK_STATUS))
 {
-    [JSExport]
-    internal static string Greeting()
+    Console.Error.WriteLine("Unable to initialize the shader program: " + GL.GetProgramInfoLog(shaderProgram));
+    return;
+}
+
+GL.UseProgram(shaderProgram);
+
+// Create a buffer for the triangle's positions.
+var positionBuffer = GL.CreateBuffer();
+GL.BindBuffer(GL.ARRAY_BUFFER, positionBuffer);
+
+// Define the positions for the triangle.
+double[] positionsDouble =
+[
+    0.0f, 1.0f,
+    -1.0f, -1.0f,
+    1.0f, -1.0f
+];
+var positions = Utility.CreateFloat32Array(positionsDouble);
+GL.BufferData(GL.ARRAY_BUFFER, positions, GL.STATIC_DRAW);
+
+// Create a buffer for the triangle's colors.
+var colorBuffer = GL.CreateBuffer();
+GL.BindBuffer(GL.ARRAY_BUFFER, colorBuffer);
+
+// Define the colors for each vertex of the triangle (Rainbow: Red, Green, Blue).
+double[] colorsDouble =
+[
+    1.0f, 0.0f, 0.0f, 1.0f, // Red
+    0.0f, 1.0f, 0.0f, 1.0f, // Green
+    0.0f, 0.0f, 1.0f, 1.0f  // Blue
+];
+var colors = Utility.CreateFloat32Array(colorsDouble);
+GL.BufferData(GL.ARRAY_BUFFER, colors, GL.STATIC_DRAW);
+
+// Tell WebGL how to pull out the positions from the position buffer into the vertexPosition attribute.
+GL.BindBuffer(GL.ARRAY_BUFFER, positionBuffer);
+var positionAttributeLocation = GL.GetAttribLocation(shaderProgram, "aVertexPosition");
+GL.VertexAttribPointer(positionAttributeLocation, 2, GL.FLOAT, false, 0, 0);
+GL.EnableVertexAttribArray(positionAttributeLocation);
+
+// Tell WebGL how to pull out the colors from the color buffer into the vertexColor attribute.
+GL.BindBuffer(GL.ARRAY_BUFFER, colorBuffer);
+var colorAttributeLocation = GL.GetAttribLocation(shaderProgram, "aVertexColor");
+GL.VertexAttribPointer(colorAttributeLocation, 4, GL.FLOAT, false, 0, 0);
+GL.EnableVertexAttribArray(colorAttributeLocation);
+
+// Set the clear color to cornflower blue
+GL.ClearColor(0.39f, 0.58f, 0.93f, 1.0f);
+GL.Clear(GL.COLOR_BUFFER_BIT);
+
+// Draw the triangle
+GL.DrawArrays(GL.TRIANGLES, 0, 3);
+
+// Function to load and compile shaders
+static JSObject LoadShader(int type, string source)
+{
+    var shader = GL.CreateShader(type);
+    GL.ShaderSource(shader, source);
+    GL.CompileShader(shader);
+
+    if (!GL.GetShaderParameter(shader, GL.COMPILE_STATUS))
     {
-        var text = $"Hello, World! Greetings from {GetHRef()}";
-        Console.WriteLine(text);
-        return text;
+        GL.DeleteShader(shader);
+        throw new Exception("An error occurred compiling the shaders.");
     }
 
-    [JSImport("window.location.href", "main.js")]
-    internal static partial string GetHRef();
-
-    [JSImport("gl.clearColor", "main.js")]
-    internal static partial void ClearColor(float red, float green, float blue, float alpha);
-
-    public const int COLOR_BUFFER_BIT = 0x00004000;
-
-    [JSImport("gl.clear", "main.js")]
-    internal static partial void Clear(int mask);
+    return shader;
 }
