@@ -1,3 +1,4 @@
+_UPDATE: This evolved into a [`dotnet new webgl` template.](https://github.com/ThoughtStuff/WebGL.Template)_
 
 ```
 > dotnet run
